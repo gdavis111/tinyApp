@@ -10,6 +10,8 @@ var urlDatabase = {
   "9sm5xK": "http://www.google.com"
 };
 
+app.use(bodyParser.urlencoded({extended: true}));
+
 app.get("/", (req, res) => {
   res.end("Hello!");
 });
@@ -23,7 +25,7 @@ app.get("/hello", (req, res) => {
 });
 
 app.get("/urls", (req, res) => {
-  let templateVars = { urls: urlDatabase };
+  let templateVars = { urls: urlDatabase }; // urls key could be anything, user assigned.
   res.render("urls_index", templateVars);
 });
 
@@ -32,24 +34,31 @@ app.get("/urls/new", (req, res) => {
 });
 
 app.get("/urls/:id", (req, res) => {
-  let templateVars = { shortURL: req.params.id,
-                        longURL: urlDatabase[req.params.id] };
+  let templateVars = { shortURL: req.params.id, //req.params.id.  id = the user input after /urls/
+                        longURL: urlDatabase[req.params.id] };  // if id is not something in database it just returns input
   res.render("urls_show", templateVars);
 });
-
-app.use(bodyParser.urlencoded({extended: true}));
-
 
 app.post("/urls", (req, res) => {
     const shortURL = generateRandomString();
     urlDatabase[shortURL] = req.body.longURL;
- //console.log('blah', req.body);
+    //console.log('blah', req.body.longURL);  // req.body is new object with key longURL and value = full URL of website
  res.redirect(`urls/${shortURL}`);
 });
 
 app.get("/u/:shortURL", (req, res) => {
    let longURL = urlDatabase[req.params.shortURL];
   res.redirect(longURL);
+});
+
+app.post("/urls/:id/delete", (req, res) => {
+  delete urlDatabase[req.params.id];
+  res.redirect("/urls/");
+});
+
+app.post("/urls/:id/update", (req, res) => {
+  urlDatabase[req.params.id] = req.body.longURL;
+  res.redirect("/urls/");
 });
 
 app.listen(PORT, () => {
