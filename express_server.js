@@ -13,6 +13,19 @@ var urlDatabase = {
   "9sm5xK": "http://www.google.com"
 };
 
+const users = {
+  "userRandomID": {
+    id: "userRandomID",
+    email: "user@example.com",
+    password: "purple-monkey-dinosaur"
+  },
+ "user2RandomID": {
+    id: "user2RandomID",
+    email: "user2@example.com",
+    password: "dishwasher-funk"
+  }
+}
+
 app.use(bodyParser.urlencoded({extended: true}));
 
 app.get("/", (req, res) => {
@@ -47,6 +60,18 @@ app.get("/urls/:id", (req, res) => {
                       };
   res.render("urls_show", templateVars);
 });
+
+app.get("/register", (req, res) => {
+  res.render("register");
+});
+
+app.post("/register", (req, res) => {
+  const randomID = generateRandomString();
+  users[randomID] = {"id": randomID, "email": req.body.email, "password": req.body.password};
+  console.log("Users object =", users);
+  res.cookie('user_id', randomID);
+  res.redirect('/urls/');
+})
 
 app.post("/urls", (req, res) => {
     const shortURL = generateRandomString();
