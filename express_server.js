@@ -28,17 +28,23 @@ app.get("/hello", (req, res) => {
 });
 
 app.get("/urls", (req, res) => {
-  let templateVars = { urls: urlDatabase }; // urls key could be anything, user assigned.
+  let templateVars = { username: req.cookies["username"], // added line to templateVars for cookies
+                       urls: urlDatabase
+                     };
   res.render("urls_index", templateVars);
 });
 
 app.get("/urls/new", (req, res) => {
-  res.render("urls_new");
+  let templateVars = {  username: req.cookies["username"]  // added whole templateVars for cookies
+                     };
+  res.render("urls_new", templateVars);
 });
 
 app.get("/urls/:id", (req, res) => {
-  let templateVars = { shortURL: req.params.id, //req.params.id.  id = the user input after /urls/
-                        longURL: urlDatabase[req.params.id] };  // if id is not something in database it just returns input
+  let templateVars = {  username: req.cookies["username"], // added line to template vars for cookies
+                        shortURL: req.params.id, //req.params.id.  id = the user input after /urls/
+                        longURL: urlDatabase[req.params.id]
+                      };
   res.render("urls_show", templateVars);
 });
 
