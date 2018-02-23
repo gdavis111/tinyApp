@@ -17,6 +17,14 @@ var urlDatabase = {
   }
 };
 
+// var newDatabase = {
+//   "userRandomID": { tinyurl1: {},
+//   tinyurl2: {longurl},
+//   tinyurl3: {long url}
+//     ...
+//   }
+// }
+
 const users = {
   "userRandomID": {
     id: "userRandomID",
@@ -45,9 +53,12 @@ app.get("/hello", (req, res) => {
 });
 
 app.get("/urls", (req, res) => {
+ // urlsForUser(req.cookies.user_id);  // calling function to attemp to integrate into index.
+
   let templateVars = {
-    user: users[req.cookies.user_id],
-    urls: urlDatabase.local
+    userURLs: urlDatabase[req.cookies.user_id],
+    user: users[req.cookies.user_id]
+   // urls: urlsForUser(req.cookies.user_id)//.req.cookies.user_id
   };
   res.render("urls_index", templateVars);
 });
@@ -77,15 +88,15 @@ app.get("/register", (req, res) => {
 });
 
 app.post("/register", (req, res) => {
-  if (!req.body.email || !req.body.password) {
+  if (!req.body.email || !req.body.password) {  // ensuring email and password are filled out
     res.status(400).send('Must fill in email and password sections');
   }
   for (let id in users) {
-    if (req.body.email == users[id].email) {
+    if (req.body.email == users[id].email) {  // making sure register email doesnt already exist
       return res.status(400).send('Email already exists');
     }
   }
-  const randomID = generateRandomString();
+  const randomID = generateRandomString();  // generating random 6 digit ID for user
   users[randomID] = {"id": randomID, "email": req.body.email, "password": req.body.password};
   res.cookie('user_id', randomID);
   res.redirect('/urls/');
@@ -96,24 +107,28 @@ app.get("/login", (req, res) => {
 });
 
 app.post("/urls", (req, res) => {
-    const shortURL = generateRandomString();
+    const shortURL = generateRandomString();  // generating random 6 digit ID for inputted URL
     if (!urlDatabase[req.cookies.user_id]) {
     urlDatabase[req.cookies.user_id] = {};
     urlDatabase[req.cookies.user_id][shortURL] = req.body.longURL;
     } else {
       urlDatabase[req.cookies.user_id][shortURL] = req.body.longURL;
     }
-    console.log(urlDatabase);
  res.redirect(`urls/${shortURL}`);
 });
 
 app.get("/u/:shortURL", (req, res) => {
-   let longURL = urlDatabase[req.params.shortURL];
-  res.redirect(longURL);
+  // if(req.cookies.user_id) {
+  //   let longURL = urlDatabase[req.cookies.user_id][req.params.shortURL];
+  //   res.redirect(longURL);
+  // } else {
+    var fullURL = findUserID(req.params.shortURL);
+    res.redirect(fullURL);
+  //}
 });
 
 app.post("/urls/:id/delete", (req, res) => {
-  delete urlDatabase[req.params.id];
+  delete urlDatabase[req.cookies.user_id][req.params.id]; // used to be urlDatabase.[req.params.id]
   res.redirect("/urls/");
 });
 
@@ -160,19 +175,27 @@ function findUserByEmail(email) {
    if (users[user].email === email) {
      return users[user].id
    }
- }
+  }
 }
 
-function hasUserPass(email, password) {
-  for (let user in users) {
-    if (email == users[user].email) {
-      if (password == users[user].password) {
-        return true;
-      } else {
-      }
+function findUserID (URL) {
+  for (var userCode in urlDatabase) {
+    if (urlDatabase[userCode][URL]) {
+      return urlDatabase[userCode][URL]
+      console.log(urlDatabase[userCode][URL]);
     }
   }
-  return false;
 }
 
+// function hasUserPass(email, password) {
+//   for (let user in users) {
+//     if (email == users[user].email) {
+//       if (password == users[user].password) {
+//         return true;
+//       } else {
+//       }
+//     }
+//   }
+//   return false;
+// }
 
