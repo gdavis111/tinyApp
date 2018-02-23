@@ -11,10 +11,10 @@
       <th>Full URL</th>
     </tr>
     <tbody>
-      <% for(let shortURL in urls) { %>
+      <!-- <% for(let shortURL in urls) { %> -->
       <tr>
-        <td><%= shortURL %></td>
-        <td><%= urls[shortURL] %></td>
+        <!--<td><%= shortURL %></td>
+        <td><%= urls[shortURL] %></td>-->
         <td>
           <form method="GET" action="/urls/<%= shortURL %>">
             <button>Edit</button>
@@ -26,7 +26,7 @@
           </form>
         </td>
       </tr>
-      <% } %>
+      <!--<% } %> -->
     </tbody>
   </table>
   <p><a href="/urls/new">Shorten URL</a><p>

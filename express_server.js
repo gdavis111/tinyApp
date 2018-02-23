@@ -9,8 +9,12 @@ app.set("view engine", "ejs")
 app.use(cookieParser());
 
 var urlDatabase = {
-  "b2xVn2": "http://www.lighthouselabs.ca",
-  "9sm5xK": "http://www.google.com"
+  "userRandomID": {
+    "b2xVn2": "http://www.lighthouselabs.ca"
+  },
+  "user2RandomID": {
+    "9sm5xK": "http://www.google.com"
+  }
 };
 
 const users = {
@@ -43,7 +47,7 @@ app.get("/hello", (req, res) => {
 app.get("/urls", (req, res) => {
   let templateVars = {
     user: users[req.cookies.user_id],
-    urls: urlDatabase
+    urls: urlDatabase.local
   };
   res.render("urls_index", templateVars);
 });
@@ -52,8 +56,11 @@ app.get("/urls/new", (req, res) => {
   let templateVars = {
     user: users[req.cookies.user_id]  // added whole templateVars for cookies
   };
-                    // console.log(templateVars.userID);
-  res.render("urls_new", templateVars);
+  if (users[req.cookies.user_id]) {
+    res.render("urls_new", templateVars);
+  } else {
+    res.redirect("/login")
+  }
 });
 
 app.get("/urls/:id", (req, res) => {
@@ -90,8 +97,13 @@ app.get("/login", (req, res) => {
 
 app.post("/urls", (req, res) => {
     const shortURL = generateRandomString();
-    urlDatabase[shortURL] = req.body.longURL;
-    //console.log('blah', req.body.longURL);  // req.body is new object with key longURL and value = full URL of website
+    if (!urlDatabase[req.cookies.user_id]) {
+    urlDatabase[req.cookies.user_id] = {};
+    urlDatabase[req.cookies.user_id][shortURL] = req.body.longURL;
+    } else {
+      urlDatabase[req.cookies.user_id][shortURL] = req.body.longURL;
+    }
+    console.log(urlDatabase);
  res.redirect(`urls/${shortURL}`);
 });
 
@@ -106,7 +118,7 @@ app.post("/urls/:id/delete", (req, res) => {
 });
 
 app.post("/urls/:id/update", (req, res) => {
-  urlDatabase[req.params.id] = req.body.longURL;
+  urlDatabase[req.cookies.user_id][req.params.id] = req.body.longURL;
   res.redirect("/urls/");
 });
 
