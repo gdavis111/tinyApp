@@ -1,14 +1,14 @@
-<h1> TinyAPP </h1>
-
-
-
- <% if(user){ %>
+<!DOCTYPE html>
+<html lang="en">
+<body>
+  <h1> TinyAPP </h1>
+  <% if(user){ %>
   <form action="/logout" method="POST" style="padding-bottom:30px;">
     <p>Logged in as <%= user.email %></p>
     <button style="margin-bottom:30px;">Logout</button>
   </form>
-<% } else{ %>
-
+  <% } else{ %>
   <p><a href="/register/">Register</a></p>
   <p><a href="/login/">Login</a></p>
-<% } %>
+  <% } %>
+</body>
