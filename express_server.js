@@ -83,10 +83,12 @@ app.post("/register", (req, res) => {
       return res.status(400).send('Email already exists');
     }
   }
+  if (req.body.email && req.body.password) {
   var randomID = generateRandomString();  // generating random 6 digit ID for user
   users[randomID] = {"id": randomID, "email": req.body.email, "password": bcrypt.hashSync(req.body.password, 10)};
   req.session.user_id = randomID;
   res.redirect('/urls');
+  }
 });
 
 app.get("/login", (req, res) => {
